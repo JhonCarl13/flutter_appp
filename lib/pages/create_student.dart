@@ -13,6 +13,9 @@ class _CreateStudentState extends State<CreateStudent> {
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _courseController = TextEditingController();
 
+  // Loading state para sa submit button
+  bool _isLoading = false;
+
   // Define the green theme color
   final Color primaryGreen = const Color(0xFF0F8A17);
 
@@ -41,28 +44,45 @@ class _CreateStudentState extends State<CreateStudent> {
       return;
     }
 
-    // Save student details to Firestore
-    await FirebaseFirestore.instance.collection('students').add({
-      'student_no': studentNo,
-      'name': fullName,
-      'course': course,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+    setState(() => _isLoading = true);
 
-    _studentNoController.clear();
-    _fullNameController.clear();
-    _courseController.clear();
+    try {
+      // Save student details to Firestore
+      await FirebaseFirestore.instance.collection('students').add({
+        'student_no': studentNo,
+        'name': fullName,
+        'course': course,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Student added successfully!'),
-          backgroundColor: primaryGreen,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
-      );
-      Navigator.pop(context);
+      _studentNoController.clear();
+      _fullNameController.clear();
+      _courseController.clear();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Student added successfully!'),
+            backgroundColor: primaryGreen,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red.shade600,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -220,11 +240,11 @@ class _CreateStudentState extends State<CreateStudent> {
                     ),
                     const SizedBox(height: 28),
 
-                    // Submit Button
+                    // Submit Button with Loading Indicator
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: saveStudent,
+                        onPressed: _isLoading ? null : saveStudent,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryGreen,
                           foregroundColor: Colors.white,
@@ -234,14 +254,23 @@ class _CreateStudentState extends State<CreateStudent> {
                             borderRadius: BorderRadius.circular(14),
                           ),
                         ),
-                        child: const Text(
-                          "Save Student Record",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text(
+                                "Save Student Record",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
                       ),
                     ),
                   ],

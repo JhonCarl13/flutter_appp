@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_firebase/student_page.dart';
 import 'firebase_options.dart';
+import 'pages/dashboard_page.dart';
 import 'pages/login_page.dart';
 
 Future<void> main() async {
@@ -18,13 +18,13 @@ class StudentInformationApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const primaryGreen = Color(0xFF0F8A17);
+    const deepGreen = Color(0xFF0C5132);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Student Information App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: primaryGreen),
+        colorSchemeSeed: deepGreen,
         useMaterial3: true,
       ),
       home: StreamBuilder<User?>(
@@ -33,12 +33,12 @@ class StudentInformationApp extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(
               body: Center(
-                child: CircularProgressIndicator(color: primaryGreen),
+                child: CircularProgressIndicator(color: deepGreen),
               ),
             );
           }
-          // If logged in, show your working StudentPage; otherwise show LoginPage
-          return snapshot.hasData ? const StudentPage() : const LoginPage();
+          // Kung nakalog-in, ipakita ang DashboardPage; kung hindi, LoginPage
+          return snapshot.hasData ? const DashboardPage() : const LoginPage();
         },
       ),
     );

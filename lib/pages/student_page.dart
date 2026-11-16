@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_firebase/create_student.dart';
+import 'create_student.dart';
 
 class StudentPage extends StatefulWidget {
   const StudentPage({super.key});
@@ -10,25 +10,18 @@ class StudentPage extends StatefulWidget {
 }
 
 class _StudentPageState extends State<StudentPage> {
-  final CollectionReference<Map<String, dynamic>> students = FirebaseFirestore
-      .instance
-      .collection('students');
+  // Pinalitan natin para maging malinis at walang type error
+  final students = FirebaseFirestore.instance.collection('students');
 
   String getInitials(String name) {
     final parts = name.trim().split(RegExp(r'\s+'));
-
     if (name.trim().isEmpty) return '?';
-
-    if (parts.length == 1) {
-      return parts.first[0].toUpperCase();
-    }
-
+    if (parts.length == 1) return parts.first[0].toUpperCase();
     return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Updated to the new green theme color #0F8A17
     const primaryColor = Color(0xFF0F8A17);
     const backgroundColor = Color(0xFFF5F7FC);
 
@@ -45,7 +38,6 @@ class _StudentPageState extends State<StudentPage> {
         ),
         centerTitle: true,
         elevation: 0,
-        scrolledUnderElevation: 0,
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         actions: [
@@ -69,7 +61,7 @@ class _StudentPageState extends State<StudentPage> {
             constraints: const BoxConstraints(maxWidth: 700),
             child: Padding(
               padding: const EdgeInsets.only(top: 20),
-              child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              child: StreamBuilder<QuerySnapshot>(
                 stream: students.snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -109,7 +101,7 @@ class _StudentPageState extends State<StudentPage> {
                     itemCount: documents.length,
                     itemBuilder: (context, index) {
                       final document = documents[index];
-                      final data = document.data();
+                      final data = document.data() as Map<String, dynamic>;
 
                       final studentno = data["student_no"] ?? '';
                       final name = data["name"] ?? '';
@@ -136,9 +128,7 @@ class _StudentPageState extends State<StudentPage> {
                                 children: [
                                   CircleAvatar(
                                     radius: 26,
-                                    backgroundColor: const Color(
-                                      0xFFE3F7E5,
-                                    ), // Light green tint for avatar background
+                                    backgroundColor: const Color(0xFFE3F7E5),
                                     child: Text(
                                       getInitials(name),
                                       style: const TextStyle(
@@ -186,7 +176,9 @@ class _StudentPageState extends State<StudentPage> {
                                     ),
                                   ),
                                   IconButton(
-                                    onPressed: () {},
+                                    onPressed: () async {
+                                      await students.doc(document.id).delete();
+                                    },
                                     icon: const Icon(
                                       Icons.delete_outline_rounded,
                                       color: Color(0xFF94A3B8),
@@ -203,9 +195,7 @@ class _StudentPageState extends State<StudentPage> {
                                   vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(
-                                    0xFFF0F9F1,
-                                  ), // Light green tint for course badge box
+                                  color: const Color(0xFFF0F9F1),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Row(
