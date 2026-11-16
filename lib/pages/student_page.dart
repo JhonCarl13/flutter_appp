@@ -10,7 +10,6 @@ class StudentPage extends StatefulWidget {
 }
 
 class _StudentPageState extends State<StudentPage> {
-  // Pinalitan natin para maging malinis at walang type error
   final students = FirebaseFirestore.instance.collection('students');
 
   String getInitials(String name) {
@@ -22,7 +21,8 @@ class _StudentPageState extends State<StudentPage> {
 
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color(0xFF0F8A17);
+    // Pinalitan natin ng deep emerald green para tumugma sa tema
+    const primaryColor = Color(0xFF0C5132);
     const backgroundColor = Color(0xFFF5F7FC);
 
     return Scaffold(
