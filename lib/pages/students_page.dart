@@ -11,25 +11,35 @@ class StudentsPage extends StatelessWidget {
     final uid = FirebaseAuth.instance.currentUser!.uid;
     final collection = FirebaseFirestore.instance.collection('users').doc(uid).collection('students');
     const deepGreen = Color(0xFF0C5132);
+    const surfaceColor = Color(0xFFF8F9FA);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4FBF7),
+      backgroundColor: surfaceColor,
       appBar: AppBar(
-        title: const Text('Student Records', style: TextStyle(color: Colors.white)),
+        title: const Text(
+          'Student Records',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
+        ),
         backgroundColor: deepGreen,
+        elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: deepGreen,
         foregroundColor: Colors.white,
+        elevation: 2,
         onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StudentFormPage())),
-        icon: const Icon(Icons.add), 
-        label: const Text('Add Student', style: TextStyle(fontWeight: FontWeight.bold)),
+        icon: const Icon(Icons.add_rounded), 
+        label: const Text('Add Student', style: TextStyle(fontWeight: FontWeight.w600)),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: collection.orderBy('fullName').snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.hasError) return const Center(child: Text('Unable to load students.'));
+          if (snapshot.hasError) return const Center(child: Text('Unable to load students.', style: TextStyle(color: Colors.redAccent)));
           if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: deepGreen));
           final docs = snapshot.data!.docs;
           if (docs.isEmpty) {
@@ -37,11 +47,21 @@ class StudentsPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.folder_open, size: 64, color: deepGreen.withOpacity(0.5)),
-                  const SizedBox(height: 12),
-                  const Text('No student records yet.', style: TextStyle(fontSize: 16, color: Colors.grey)),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F5E9),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Icon(Icons.folder_open_rounded, size: 48, color: deepGreen),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'No student records yet.',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1A1D1E)),
+                  ),
                   const SizedBox(height: 4),
-                  const Text('Tap "Add Student" below to create one.', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                  Text('Tap "Add Student" below to create one.', style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
                 ],
               ),
             );
@@ -59,17 +79,18 @@ class StudentsPage extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.grey.shade200, width: 1),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.02),
                       blurRadius: 8,
-                      offset: const Offset(0, 3),
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                   leading: CircleAvatar(
                     backgroundColor: const Color(0xFFE8F5E9),
                     foregroundColor: deepGreen,
@@ -77,18 +98,19 @@ class StudentsPage extends StatelessWidget {
                   ),
                   title: Text(
                     fullName,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Color(0xFF1A1D1E)),
                   ),
                   subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 4),
+                    padding: const EdgeInsets.only(top: 6),
                     child: Text(
                       'No: ${data['studentNumber'] ?? 'N/A'} • ${data['course'] ?? ''} (${data['yearLevel'] ?? ''})\n${data['email'] ?? ''}',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 13, height: 1.3),
+                      style: TextStyle(color: Colors.grey.shade600, fontSize: 13, height: 1.4),
                     ),
                   ),
                   isThreeLine: true,
                   trailing: PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert, color: Colors.grey),
+                    icon: Icon(Icons.more_vert_rounded, color: Colors.grey.shade600),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     onSelected: (action) async {
                       if (action == 'edit') {
                         if (!context.mounted) return;
@@ -97,12 +119,16 @@ class StudentsPage extends StatelessWidget {
                         final confirmed = await showDialog<bool>(
                           context: context,
                           builder: (dialogContext) => AlertDialog(
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                             title: const Text('Delete student?'),
                             content: Text('Delete $fullName? This cannot be undone.'),
                             actions: [
                               TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancel')),
                               FilledButton(
-                                style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                ),
                                 onPressed: () => Navigator.pop(dialogContext, true), 
                                 child: const Text('Delete'),
                               ),
@@ -119,8 +145,14 @@ class StudentsPage extends StatelessWidget {
                       }
                     },
                     itemBuilder: (_) => const [
-                      PopupMenuItem(value: 'edit', child: Row(children: [Icon(Icons.edit, size: 18, color: Colors.blue), SizedBox(width: 8), Text('Edit')])),
-                      PopupMenuItem(value: 'delete', child: Row(children: [Icon(Icons.delete, size: 18, color: Colors.red), SizedBox(width: 8), Text('Delete')])),
+                      PopupMenuItem(
+                        value: 'edit',
+                        child: Row(children: [Icon(Icons.edit_outlined, size: 18, color: Colors.blue), SizedBox(width: 10), Text('Edit')]),
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(children: [Icon(Icons.delete_outline_rounded, size: 18, color: Colors.red), SizedBox(width: 10), Text('Delete')]),
+                      ),
                     ],
                   ),
                 ),

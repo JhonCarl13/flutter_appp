@@ -66,6 +66,8 @@ class _StudentFormPageState extends State<StudentFormPage> {
 
   Widget _field(TextEditingController controller, String label, IconData icon, {bool email = false}) {
     const deepGreen = Color(0xFF0C5132);
+    const surfaceColor = Color(0xFFF8F9FA);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: TextFormField(
@@ -73,11 +75,20 @@ class _StudentFormPageState extends State<StudentFormPage> {
         keyboardType: email ? TextInputType.emailAddress : TextInputType.text,
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Icon(icon, color: deepGreen),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          prefixIcon: Icon(icon, color: Colors.grey.shade600, size: 20),
+          filled: true,
+          fillColor: surfaceColor,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: deepGreen, width: 2),
+            borderSide: const BorderSide(color: deepGreen, width: 1.8),
           ),
         ),
         validator: (v) {
@@ -92,53 +103,119 @@ class _StudentFormPageState extends State<StudentFormPage> {
   @override
   Widget build(BuildContext context) {
     const deepGreen = Color(0xFF0C5132);
+    const surfaceColor = Color(0xFFF8F9FA);
     final isEditing = widget.documentId != null;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4FBF7),
+      backgroundColor: surfaceColor,
       appBar: AppBar(
-        title: Text(isEditing ? 'Edit Student Record' : 'Add New Student', style: const TextStyle(color: Colors.white)),
+        title: Text(
+          isEditing ? 'Edit Student Record' : 'Add New Student',
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
+        ),
         backgroundColor: deepGreen,
+        elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
-        child: Card(
-          elevation: 4,
-          shadowColor: Colors.black12,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Form(
-              key: _key,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    isEditing ? 'Update Student Details' : 'Student Information',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: deepGreen),
-                  ),
-                  const SizedBox(height: 16),
-                  _field(_number, 'Student Number', Icons.badge_outlined),
-                  _field(_name, 'Full Name', Icons.person_outline),
-                  _field(_course, 'Course', Icons.school_outlined),
-                  _field(_year, 'Year Level', Icons.calendar_today_outlined),
-                  _field(_email, 'Email Address', Icons.email_outlined, email: true),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    height: 50,
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: deepGreen,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: Colors.grey.shade200, width: 1),
+              ),
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(28),
+                child: Form(
+                  key: _key,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE8F5E9),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              isEditing ? Icons.edit_note_rounded : Icons.person_add_rounded,
+                              color: deepGreen,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  isEditing ? 'Update Student Details' : 'Student Information',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF1A1D1E),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  isEditing ? 'Modify the fields below' : 'Fill in the student details',
+                                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      onPressed: _saving ? null : _save,
-                      child: _saving 
-                          ? const CircularProgressIndicator(color: Colors.white) 
-                          : Text(isEditing ? 'Update Changes' : 'Save Student', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    ),
+                      const SizedBox(height: 24),
+                      _field(_number, 'Student Number', Icons.badge_outlined),
+                      _field(_name, 'Full Name', Icons.person_outline),
+                      _field(_course, 'Course', Icons.school_outlined),
+                      _field(_year, 'Year Level', Icons.calendar_today_outlined),
+                      _field(_email, 'Email Address', Icons.email_outlined, email: true),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 48,
+                        child: FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: deepGreen,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: _saving ? null : _save,
+                          child: _saving
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2.5,
+                                  ),
+                                )
+                              : Text(
+                                  isEditing ? 'Update Changes' : 'Save Student',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),

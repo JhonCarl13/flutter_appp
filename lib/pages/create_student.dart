@@ -13,11 +13,9 @@ class _CreateStudentState extends State<CreateStudent> {
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _courseController = TextEditingController();
 
-  // Loading state para sa submit button
   bool _isLoading = false;
-
-  // Define the green theme color
-  final Color primaryGreen = const Color(0xFF0F8A17);
+  // Unified global primary green theme
+  final Color primaryGreen = const Color(0xFF0C5132);
 
   @override
   void dispose() {
@@ -47,7 +45,6 @@ class _CreateStudentState extends State<CreateStudent> {
     setState(() => _isLoading = true);
 
     try {
-      // Save student details to Firestore
       await FirebaseFirestore.instance.collection('students').add({
         'student_no': studentNo,
         'name': fullName,
@@ -92,6 +89,7 @@ class _CreateStudentState extends State<CreateStudent> {
     required String hintText,
     required IconData icon,
   }) {
+    const surfaceColor = Color(0xFFF8F9FA);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -104,22 +102,28 @@ class _CreateStudentState extends State<CreateStudent> {
           ),
         ),
         const SizedBox(height: 6),
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
-          ),
-          child: TextField(
-            controller: controller,
-            style: const TextStyle(fontSize: 14, color: Color(0xFF1E293B)),
-            decoration: InputDecoration(
-              hintText: hintText,
-              hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-              prefixIcon: Icon(icon, color: primaryGreen, size: 20),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+        TextField(
+          controller: controller,
+          style: const TextStyle(fontSize: 14, color: Color(0xFF1E293B)),
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+            prefixIcon: Icon(icon, color: primaryGreen, size: 20),
+            filled: true,
+            fillColor: surfaceColor,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: primaryGreen, width: 1.8),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
           ),
         ),
       ],
@@ -128,8 +132,10 @@ class _CreateStudentState extends State<CreateStudent> {
 
   @override
   Widget build(BuildContext context) {
+    const surfaceColor = Color(0xFFF8F9FA);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
+      backgroundColor: surfaceColor,
       appBar: AppBar(
         backgroundColor: primaryGreen,
         elevation: 0,
@@ -154,12 +160,13 @@ class _CreateStudentState extends State<CreateStudent> {
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.grey.shade200, width: 1),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.03),
-                      blurRadius: 15,
-                      offset: const Offset(0, 6),
+                      color: Colors.black.withValues(alpha: 0.02),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
@@ -167,19 +174,18 @@ class _CreateStudentState extends State<CreateStudent> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header Banner inside card
                     Row(
                       children: [
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF0FDF4),
-                            borderRadius: BorderRadius.circular(14),
+                            color: const Color(0xFFE8F5E9),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(
                             Icons.person_add_rounded,
                             color: primaryGreen,
-                            size: 26,
+                            size: 24,
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -190,7 +196,7 @@ class _CreateStudentState extends State<CreateStudent> {
                               Text(
                                 "Student Information",
                                 style: TextStyle(
-                                  fontSize: 17,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF1E293B),
                                 ),
@@ -212,8 +218,6 @@ class _CreateStudentState extends State<CreateStudent> {
                       padding: EdgeInsets.symmetric(vertical: 20),
                       child: Divider(color: Color(0xFFF1F5F9), height: 1),
                     ),
-
-                    // Student No. Field
                     _buildCustomTextField(
                       controller: _studentNoController,
                       labelText: "Student Number",
@@ -221,8 +225,6 @@ class _CreateStudentState extends State<CreateStudent> {
                       icon: Icons.badge_outlined,
                     ),
                     const SizedBox(height: 16),
-
-                    // Full Name Field
                     _buildCustomTextField(
                       controller: _fullNameController,
                       labelText: "Full Name",
@@ -230,28 +232,24 @@ class _CreateStudentState extends State<CreateStudent> {
                       icon: Icons.person_outline,
                     ),
                     const SizedBox(height: 16),
-
-                    // Course Field
                     _buildCustomTextField(
                       controller: _courseController,
                       labelText: "Course / Program",
                       hintText: "e.g., BS Information Technology",
                       icon: Icons.school_outlined,
                     ),
-                    const SizedBox(height: 28),
-
-                    // Submit Button with Loading Indicator
+                    const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
+                      height: 48,
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : saveStudent,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryGreen,
                           foregroundColor: Colors.white,
                           elevation: 0,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                         child: _isLoading
@@ -260,15 +258,14 @@ class _CreateStudentState extends State<CreateStudent> {
                                 width: 20,
                                 child: CircularProgressIndicator(
                                   color: Colors.white,
-                                  strokeWidth: 2,
+                                  strokeWidth: 2.5,
                                 ),
                               )
                             : const Text(
                                 "Save Student Record",
                                 style: TextStyle(
                                   fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.3,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                       ),

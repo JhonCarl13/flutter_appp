@@ -18,14 +18,58 @@ class StudentInformationApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const deepGreen = Color(0xFF0C5132);
+    const primaryGreen = Color(0xFF0C5132);
+    const surfaceColor = Color(0xFFF8F9FA);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Student Information App',
       theme: ThemeData(
-        colorSchemeSeed: deepGreen,
         useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: primaryGreen,
+          brightness: Brightness.light,
+        ),
+        scaffoldBackgroundColor: surfaceColor,
+        // Professional clean card styling
+        cardTheme: CardThemeData(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: Colors.grey.shade200, width: 1),
+          ),
+          color: Colors.white,
+        ),
+        // Modern button styling
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            elevation: 0,
+            backgroundColor: primaryGreen,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          ),
+        ),
+        // Clean text input fields styling
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: primaryGreen, width: 2),
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
       ),
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
@@ -33,7 +77,7 @@ class StudentInformationApp extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(
               body: Center(
-                child: CircularProgressIndicator(color: deepGreen),
+                child: CircularProgressIndicator(color: primaryGreen),
               ),
             );
           }
